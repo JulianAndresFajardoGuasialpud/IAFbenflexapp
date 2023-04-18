@@ -1,40 +1,65 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.contrib.auth.forms import UserCreationForm
+from IAFBenflex.models import Users
 
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+from .serializers import ReadSerializers
 # Create your views here.
+
+# View landing page
 
 
 def index(request):
     return render(request, "index.html")
 
+# View login
+
+
+def user_login(request):
+    return render(request, "login.html")
+
 # Views list users
 
+@api_view(['GET'])
 def user_list(request):
     users = Users.objects.all()
+    serializer = ReadSerializers(users, many=True)
+    return Response(serializer.data)
 
 # View to created user
 
-
-def user_create(request):
-    if request.method == 'POST':
-        form = UserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('user_list')
+def create_user(request):
+    if request.method == 'GET':
+        return render(request, 'register.html', {'form': UserCreationForm})
     else:
-        form = UserForm()
-    return render(request, 'user_create.html', {'form': form})
-
+        if request.POST.get['password'] == request.POST.get['password_confirm']:
+            try:
+                data = Users.objects.create_user(username=request.POST['username'],
+                                                email=request.POST['email'],
+                                                is_active=request.POST[''],
+                                                is_staff=request.POST[''],
+                                                is_superuser=request.POST[''],
+                                                password=request.POST['password'],
+                                                password_confirm=request.POST['password_confirm'],
+                                                created_at=request.POST[''],
+                                                update_at=request.POST[''],
+                                                )
+                data.save()
+                return Response('user create')
+            except:
+                if data.exist():
+                    return Response('username already exist')
 # view to edit user
 
 
-def user_edit(request, user_id):
-    user = get.object_or_404(User, pk=user_id)
+def edit_user(request, user_id):
+    user = Users.get.object_or_404(Users, pk=user_id)
     if request.method == 'PUT':
-        form = UserForm(request.PUT, isinstance=user)
-        if form.is_valid():
-            form.save()
-            return redirect('user_list')
+        user = Users.objects.edit_user(request.PUT['username'], isinstance=user)
+        if user.is_valid():
+            user.save()
+            return Response('user_list')
     else:
-        form = UserForm(isinstance=user)
-    return render(request, 'user_edit.html', {'form': form, 'user': user})
+        return Response('the user do not edit')
