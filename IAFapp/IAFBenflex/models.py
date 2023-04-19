@@ -8,13 +8,19 @@ class Users(models.Model):
     username = models.CharField(max_length=30)
     email = models.EmailField()
     password = models.CharField(max_length=100)
-    password_confirm = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superUser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['username', 'id']
+    
+    def __str__(Users):
+        return Users.username
+
+        
 # Model rol
 
 
