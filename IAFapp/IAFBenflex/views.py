@@ -53,7 +53,7 @@ def create_user(request):
                 serializer = UserSerializers(users, many=False)
                 return Response('User created succesfully', serializer)
             except:
-                if users.exists():
+                if users.is_valid():
                     return Response('username already exist')
 
 # view to edit user
