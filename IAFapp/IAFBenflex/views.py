@@ -5,7 +5,7 @@ from IAFBenflex.models import Users
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from .serializers import ReadSerializers
+from .serializers.serializers import UserSerializers
 # Create your views here.
 
 # View landing page
@@ -25,7 +25,7 @@ def user_login(request):
 @api_view(['GET'])
 def user_list(request):
     users = Users.objects.all()
-    serializer = ReadSerializers(users, many=True)
+    serializer = UserSerializers(users, many=True)
     return Response(serializer.data)
 
 # View to created user
