@@ -61,7 +61,7 @@ def create_user(request):
                 if serializer.is_valid():
                     return Response(serializer.data, 'User created succesfully')
                 else:
-                    return render(request, 'register.html',
+                    return render(serializer.data, 'register.html',
                                   {'form': UserCreationForm, 'errors': 'User already exists'})
         return render(request, 'register.html',
                       {'form': UserCreationForm, 'errors': 'passwod do not mach'})                     
@@ -94,12 +94,24 @@ def create_user(request):
 
 @api_view(['PUT'])
 def edit_user(request, user_id):
-    user = Users.get.object_or_404(Users, pk=user_id)
+    user = User.edit_user(request, pk=user_id)
     if request.method == 'PUT':
-        user = Users.objects.edit_user(
+        users = Users.objects.edit_user(
             request.PUT['username'], isinstance=user)
-        if user.is_valid():
-            user.save()
+        if users.is_valid():
+            users.save()
             return Response('user_list')
     else:
         return Response('the user do not edit')
+
+# View to delete user
+def delete_user(request, user_id):
+    if request.method == 'DELETE':
+        users = User.objects.delete_user(
+        )
+
+# View to logout user
+def logout_user(request):
+    if request.method == 'GET':
+        users = User.objects.get()
+    return Response(users)
