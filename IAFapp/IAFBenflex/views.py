@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.db import IntegrityError
+from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 
 from rest_framework.response import Response
@@ -12,7 +13,7 @@ from django.contrib.auth.models import User
 # Users from table IAFBenflex
 from IAFBenflex.models import Users
 
-#imports
+# imports
 from django.contrib.auth import login
 # Create your views here.
 
@@ -39,13 +40,14 @@ def user_list(request):
 
 # View to created user
 
+
 @api_view(['GET', 'POST'])
 def create_user(request):
     if request.method == 'GET':
         return render(request, 'register.html', {'form': UserCreationForm})
     else:
         if request.POST['password1'] == request.POST['password2']:
-    
+
             try:
                 users = User.objects.create_user(
                     username=request.POST['username'],
@@ -53,13 +55,42 @@ def create_user(request):
                 )
                 users.save()
                 login(request, users)
-                serializer = UserSerializers(users, many=False)
-                return Response('User created succesfully', serializer)
-            except:
+                return redirect('index')
+            except IntegrityError:
+                serializer = UserSerializers({users}, many=False)
                 if serializer.is_valid():
-                    return Response('username already exist')
-
+                    return Response(serializer.data, 'User created succesfully')
+                else:
+                    return render(request, 'register.html',
+                                  {'form': UserCreationForm, 'errors': 'User already exists'})
+        return render(request, 'register.html',
+                      {'form': UserCreationForm, 'errors': 'passwod do not mach'})                     
+""" @api_view(['GET', 'POST'])
+def create_user(request):
+    if request.method == 'GET':
+        return render(request, 'register.html', {'form': UserCreationForm})
+    else:
+        if request.POST['password1'] == request.POST['password2']:
+            
+            try:
+                users = User.objects.create_user(
+                    username=request.POST['username'],
+                    password=request.POST['password1'],
+                )
+                users.save()
+                login(request, users)
+                return redirect('index')
+            except IntegrityError:
+                serializer = UserSerializers({users}, many=False)
+                if serializer.is_valid():
+                    return Response(serializer.data, 'User created succesfully')
+                else:
+                    return render(request, 'register.html',
+                                  {'form': UserCreationForm, 'errors': 'User already exists'})
+        return render(request, 'register.html',
+                      {'form': UserCreationForm, 'errors': 'passwod do not mach'}) """
 # view to edit user
+
 
 @api_view(['PUT'])
 def edit_user(request, user_id):
