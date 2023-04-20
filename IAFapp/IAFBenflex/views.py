@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 # Users from table IAFBenflex
 from IAFBenflex.models import Users
 
+#imports
+from django.contrib.auth import login
 # Create your views here.
 
 # View landing page
@@ -50,10 +52,11 @@ def create_user(request):
                     password=request.POST['password1'],
                 )
                 users.save()
+                login(request, users)
                 serializer = UserSerializers(users, many=False)
                 return Response('User created succesfully', serializer)
             except:
-                if request.exists():
+                if serializer.is_valid():
                     return Response('username already exist')
 
 # view to edit user
