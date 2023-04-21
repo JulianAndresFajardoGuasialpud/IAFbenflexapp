@@ -9,6 +9,7 @@
     <title>SingnUp</title>
 </head>
 <body>
+    <p>{{errors}}</p>
     <form action="/create_user/" method="POST">
         {% csrf_token %}
         {{form.as_p}}
