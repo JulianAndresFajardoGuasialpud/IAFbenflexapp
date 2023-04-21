@@ -1,3 +1,5 @@
+{% extends 'index_master.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +9,12 @@
     <title>login</title>
 </head>
 <body>
-    <form action="/users/" method="GET">
-        {% csrf_token %}
+    {% csrf_token %}
+    <form action="/signIn/" method="GET">
         <button>
             login
         </button>
     </form>
 </body>
 </html>
+{% endblock %}

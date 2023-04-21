@@ -1,5 +1,4 @@
 from django.db import IntegrityError
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 
@@ -15,7 +14,7 @@ from django.contrib.auth.models import User
 from IAFBenflex.models import Users
 
 # imports
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib import messages
 # Create your views here.
 
@@ -29,7 +28,7 @@ def index(request):
 
 
 def user_login(request):
-    return render(request, "login.html")
+    return render(request, "signIn.html")
 
 # Views list users
 
@@ -49,7 +48,6 @@ def create_user(request):
         return render(request, 'register.html', {'form': UserCreationForm})
     else:
         if request.POST['password1'] == request.POST['password2']:
-            # data = request.data
 
             try:
                 users = User.objects.create_user(
@@ -57,21 +55,25 @@ def create_user(request):
                     password=request.POST['password1'],
                 )
                 users.save()
-                serializer = UserSerializers(users, many=False)
-                return render(serializer.__getattribute__, 'index.html', {'form': UserCreationForm, 'errors': 'user create succesfuly'}, login(request, users), redirect('index'))
+                login(request, users)
+                return redirect('index')
+                """     serializer = UserSerializers(users, many=False)
+                return render(serializer.data, 'index.html', {'form': UserCreationForm, 'errors': 'user create succesfuly'})    
+                """
             except IntegrityError:
                 return render(request, 'register.html',
                               {'form': UserCreationForm, 'errors': 'User already exists'})
         return render(request, 'register.html',
                       {'form': UserCreationForm, 'errors': 'passwod do not mach'})
-# view to edit user
 
+
+# view to edit user
 
 @api_view(['PUT'])
 def edit_user(request, user_id):
     user = User.edit_user(request, pk=user_id)
     if request.method == 'PUT':
-        users = Users.objects.edit_user(
+        users = User.objects.edit_user(
             request.PUT['username'], isinstance=user)
         if users.is_valid():
             users.save()
@@ -89,8 +91,11 @@ def delete_user(request, user_id):
 
 # View to logout user
 
+def signout(request):
+        logout(request)
+        return redirect('home')
 
-def logout_user(request):
+# View landing page
+def landingPages(request):
     if request.method == 'GET':
-        users = User.objects.get()
-    return Response(users)
+        return redirect('home')
