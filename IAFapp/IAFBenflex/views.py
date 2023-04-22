@@ -1,6 +1,6 @@
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -16,11 +16,16 @@ from IAFBenflex.models import Users
 # imports
 from django.contrib.auth import login, logout
 from django.contrib import messages
+
 # Create your views here.
 
 # View landing page
+def landingPages(request):
+    if request.method == 'GET':
+        return render(request, 'home.html')
 
 
+# View index
 def index(request):
     return render(request, "index.html")
 
@@ -28,11 +33,18 @@ def index(request):
 
 
 def user_login(request):
-    return render(request, "signIn.html")
+    return render(request, "signIn.html",
+        {'form_auth': AuthenticationForm}
+    )
 
-# Views list users
+# View para cerrar sesion de users
+
+def signout(request):
+        logout(request)
+        return redirect('home')
 
 
+# View para la lista de usuarios de administacion
 @api_view(['GET'])
 def user_list(request):
     users = User.objects.all()
@@ -57,9 +69,6 @@ def create_user(request):
                 users.save()
                 login(request, users)
                 return redirect('index')
-                """     serializer = UserSerializers(users, many=False)
-                return render(serializer.data, 'index.html', {'form': UserCreationForm, 'errors': 'user create succesfuly'})    
-                """
             except IntegrityError:
                 return render(request, 'register.html',
                               {'form': UserCreationForm, 'errors': 'User already exists'})
@@ -86,16 +95,4 @@ def edit_user(request, user_id):
 
 def delete_user(request, user_id):
     if request.method == 'DELETE':
-        users = User.objects.delete_user(
-        )
-
-# View to logout user
-
-def signout(request):
-        logout(request)
-        return redirect('home')
-
-# View landing page
-def landingPages(request):
-    if request.method == 'GET':
-        return redirect('home')
+        users = User.objects.delete_user()

@@ -1,20 +1,22 @@
-{% extends 'index_master.html' %}
+{% extends 'home.html' %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>login</title>
 </head>
+
 <body>
-    {% csrf_token %}
-    <form action="/signIn/" method="GET">
-        <button>
-            login
-        </button>
+    <form action="/singnIn/" method="GET">
+        {% csrf_token %}
+        {{form.as_p}}
+        {{form_auth}}
     </form>
 </body>
+
 </html>
 {% endblock %}
