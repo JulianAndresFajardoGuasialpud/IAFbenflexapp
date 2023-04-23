@@ -14,12 +14,14 @@ from django.contrib.auth.models import User
 from IAFBenflex.models import Users
 
 # imports
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
 # Create your views here.
 
 # View landing page
+
+
 def landingPages(request):
     if request.method == 'GET':
         return render(request, 'home.html')
@@ -33,15 +35,22 @@ def index(request):
 
 
 def user_login(request):
-    return render(request, "signIn.html",
-        {'form_auth': AuthenticationForm}
-    )
+    if request.method == 'GET':
+        return render(request, "signIn.html",
+                      {'form_auth': AuthenticationForm}
+                      )
+    else:
+        print(request.POST)
+        return render(request, "signIn.html",
+                      {'form_auth': AuthenticationForm}
+                      )
 
 # View para cerrar sesion de users
 
+
 def signout(request):
-        logout(request)
-        return redirect('home')
+    logout(request)
+    return redirect('home')
 
 
 # View para la lista de usuarios de administacion
