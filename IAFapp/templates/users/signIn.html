@@ -1,4 +1,3 @@
-{% extends 'home.html' %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
@@ -11,10 +10,14 @@
 </head>
 
 <body>
-    <form action="/singnIn/" method="GET">
+    <h1>{{errors}}</h1>
+    <form action="/signIn/" method="POST">
         {% csrf_token %}
         {{form.as_p}}
         {{form_auth}}
+        <button>
+            iniciar sesion
+        </button>
     </form>
 </body>
 
