@@ -17,23 +17,24 @@ from IAFBenflex.models import Users
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
+# Import forms
+from .forms import TaskForm
+
+# Import Task
+from .models import Task
+
 # Create your views here.
 
 # View landing page
-
-
 def landingPages(request):
     if request.method == 'GET':
         return render(request, 'home.html')
-
 
 # View index
 def index(request):
     return render(request, "index.html")
 
 # View login
-
-
 def user_login(request):
     if request.method == 'GET':
         return render(request, "signIn.html",
@@ -46,15 +47,13 @@ def user_login(request):
         if users is None:
             return render(request, "signIn.html",
                           {'form_auth': AuthenticationForm,
-                           'errors': 'Username or password is incorrecto or dont exists in the data base'}
+                           'errors': 'Username or password is incorrecto or dont exists in the database'}
                           )
         else:
             login(request, users)
             return redirect('index')
 
 # View para cerrar sesion de users
-
-
 def signout(request):
     logout(request)
     return redirect('home')
@@ -67,9 +66,7 @@ def user_list(request):
     serializer = UserSerializers(users, many=True)
     return Response(serializer.data)
 
-# View to created user
-
-
+# View to create user
 @api_view(['GET', 'POST'])
 def create_user(request):
     if request.method == 'GET':
@@ -91,9 +88,23 @@ def create_user(request):
         return render(request, 'register.html',
                       {'form': UserCreationForm, 'errors': 'passwod do not mach'})
 
+# View create task
+def create_task(request):
+    if request.method == 'GET':
+        return render(request, 'create_task.html',
+                      {'forms': TaskForm})
+    else:
+        try:
+            form = TaskForm(request.POST)
+            new_task = form.save(commit=False)
+            new_task.user = request.user
+            new_task.save()
+            return redirect('index')
+        except ValueError:
+            return render(request, 'create_task.html',
+                          {'forms': TaskForm, 'errors': 'please provide valid data'})
 
 # view to edit user
-
 @api_view(['PUT'])
 def edit_user(request, user_id):
     user = User.edit_user(request, pk=user_id)
@@ -107,8 +118,6 @@ def edit_user(request, user_id):
         return Response('the user do not edit')
 
 # View to delete user
-
-
 def delete_user(request, user_id):
     if request.method == 'DELETE':
         users = User.objects.delete_user()
