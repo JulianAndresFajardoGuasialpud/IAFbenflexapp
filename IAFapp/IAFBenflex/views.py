@@ -40,10 +40,17 @@ def user_login(request):
                       {'form_auth': AuthenticationForm}
                       )
     else:
-        print(request.POST)
-        return render(request, "signIn.html",
-                      {'form_auth': AuthenticationForm}
-                      )
+        users = authenticate(
+            request, username=request.POST['username'], password=request.POST['password']
+        )
+        if users is None:
+            return render(request, "signIn.html",
+                          {'form_auth': AuthenticationForm,
+                           'errors': 'Username or password is incorrecto or dont exists in the data base'}
+                          )
+        else:
+            login(request, users)
+            return redirect('index')
 
 # View para cerrar sesion de users
 

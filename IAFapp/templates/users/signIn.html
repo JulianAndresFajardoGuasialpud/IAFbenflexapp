@@ -10,7 +10,8 @@
 </head>
 
 <body>
-    <form action="/signIn/" method="GET">
+    <h1>{{errors}}</h1>
+    <form action="/signIn/" method="POST">
         {% csrf_token %}
         {{form.as_p}}
         {{form_auth}}
