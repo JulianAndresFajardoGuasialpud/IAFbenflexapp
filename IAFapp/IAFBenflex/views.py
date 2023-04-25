@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from rest_framework.response import Response
@@ -13,28 +13,35 @@ from django.contrib.auth.models import User
 # Users from table IAFBenflex
 from IAFBenflex.models import Users
 
-# imports
+# imports for users autenticated
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
 # Import forms
 from .forms import TaskForm
 
-# Import Task
+# Import Task to model
 from .models import Task
 
 # Create your views here.
 
 # View landing page
+
+@api_view(['GET'])
 def landingPages(request):
     if request.method == 'GET':
         return render(request, 'home.html')
 
-# View index
-def index(request):
-    return render(request, "index.html")
+# View task in the index panel user
 
-# View login
+
+def index(request):
+    task = Task.objects.filter(user=request.user)
+    return render(request, "index.html", {'tasks': task})
+
+# View login django user
+
+@api_view(['GET', 'POST'])
 def user_login(request):
     if request.method == 'GET':
         return render(request, "signIn.html",
@@ -53,13 +60,9 @@ def user_login(request):
             login(request, users)
             return redirect('index')
 
-# View para cerrar sesion de users
-def signout(request):
-    logout(request)
-    return redirect('home')
-
-
 # View para la lista de usuarios de administacion
+
+
 @api_view(['GET'])
 def user_list(request):
     users = User.objects.all()
@@ -67,6 +70,8 @@ def user_list(request):
     return Response(serializer.data)
 
 # View to create user
+
+
 @api_view(['GET', 'POST'])
 def create_user(request):
     if request.method == 'GET':
@@ -89,6 +94,8 @@ def create_user(request):
                       {'form': UserCreationForm, 'errors': 'passwod do not mach'})
 
 # View create task
+
+@api_view(['GET', 'POST'])
 def create_task(request):
     if request.method == 'GET':
         return render(request, 'create_task.html',
@@ -104,8 +111,27 @@ def create_task(request):
             return render(request, 'create_task.html',
                           {'forms': TaskForm, 'errors': 'please provide valid data'})
 
+# View to details of tasks and update
+
+
+@api_view(['GET', 'POST'])
+def task_detail(request, task_id):
+    if request.method == 'GET':
+        details = get_object_or_404(Task, pk=task_id)
+        formDetails = TaskForm(instance=details)
+        return render(request, 'task_detail.html', {'detail': details, 'form': formDetails})
+    else:
+        try:
+            details = get_object_or_404(Task, pk=task_id)
+            form = TaskForm(request.POST, instance=details)
+            form.save()
+            return redirect('task')
+        except ValueError:
+            return render(request, 'task_detail.html', {'detail': details, 'form': formDetails, 'errors': 'Error updating task'})
+        
 # view to edit user
-@api_view(['PUT'])
+
+@api_view(['GET','PUT'])
 def edit_user(request, user_id):
     user = User.edit_user(request, pk=user_id)
     if request.method == 'PUT':
@@ -117,7 +143,16 @@ def edit_user(request, user_id):
     else:
         return Response('the user do not edit')
 
-# View to delete user
+# View to delete users table_2
+
+
 def delete_user(request, user_id):
     if request.method == 'DELETE':
         users = User.objects.delete_user()
+
+# View para cerrar sesion de user django
+
+
+def signout(request):
+    logout(request)
+    return redirect('home')
