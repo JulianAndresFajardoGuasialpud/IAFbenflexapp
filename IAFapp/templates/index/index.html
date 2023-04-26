@@ -9,7 +9,7 @@
       <li>
         <a href="{% url 'task_detail' task.id %}">
           {% if task.important %}
-          <strong>{{task.title}}</strong>
+          <q>{{task.title}}</q>
           {% else %}
             {{task.title}}
           {% endif %}
