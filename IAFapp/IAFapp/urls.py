@@ -9,5 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('create_task/', views.create_task, name='create_task'),
     path('task/<int:task_id>/', views.task_detail, name='task_detail'),
+    path('task/<int:task_id>/complete', views.task_detail, name='task_detail'),
     path('', include('IAFBenflex.urls')),
 ]
