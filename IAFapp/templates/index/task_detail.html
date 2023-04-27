@@ -11,6 +11,7 @@
 </head>
 
 <body>
+    <!-- form for update task -->
     <div class="text-center">
         <h1>
             <p class="text-center">
@@ -21,7 +22,16 @@
             <form method="POST">
                 {% csrf_token %}
                 {{form.as_p}}
-                <button>update</button>
+                <button class="btn btn-warning">Update</button>
+            </form>
+        </div>
+    </div>
+    <!-- form for complete task -->
+    <div  class="text-center">
+        <div class="content">
+            <form action="{}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-success">Complete</button>
             </form>
         </div>
     </div>

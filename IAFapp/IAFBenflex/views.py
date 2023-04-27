@@ -122,13 +122,20 @@ def task_detail(request, task_id):
         return render(request, 'task_detail.html', {'detail': details, 'form': formDetails})
     else:
         try:
-            details = get_object_or_404(Task, pk=task_id)
-            form = TaskForm(request.POST, instance=details)
-            form.save()
-            return redirect('task')
+            if request.method == 'POST':
+                details = get_object_or_404(Task, pk=task_id)
+                form = TaskForm(request.POST, instance=details)
+                form.save()
+                return redirect('index')
         except ValueError:
             return render(request, 'task_detail.html', {'detail': details, 'form': formDetails, 'errors': 'Error updating task'})
-        
+
+
+# View to complete tasks
+def complete_task(request):
+    return redirect('index')
+
+
 # view to edit user
 
 @api_view(['GET','PUT'])
