@@ -21,7 +21,14 @@
             <form method="POST">
                 {% csrf_token %}
                 {{form.as_p}}
-                <button>update</button>
+                <button class="btn btn-warning">Update</button>
+            </form>
+        </div>
+        <br><br>
+        <div class="content">
+            <form action="{% url 'complete_task' task.id %}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-success">Complete</button>
             </form>
         </div>
     </div>

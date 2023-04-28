@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -27,6 +28,7 @@ from .models import Task
 
 # View landing page
 
+
 @api_view(['GET'])
 def landingPages(request):
     if request.method == 'GET':
@@ -40,6 +42,7 @@ def index(request):
     return render(request, "index.html", {'tasks': task})
 
 # View login django user
+
 
 @api_view(['GET', 'POST'])
 def user_login(request):
@@ -95,6 +98,7 @@ def create_user(request):
 
 # View create task
 
+
 @api_view(['GET', 'POST'])
 def create_task(request):
     if request.method == 'GET':
@@ -129,10 +133,24 @@ def task_detail(request, task_id):
                 return redirect('index')
         except ValueError:
             return render(request, 'task_detail.html', {'detail': details, 'form': formDetails, 'errors': 'Error updating task'})
-        
+
+
+# view to complete_task
+@api_view(['POST'])
+def complete_task(request, task_id):
+    complete = get_object_or_404(Task, pk=task_id)
+    if request.method == 'POST':
+        complete = get_object_or_404(Task, pk=task_id)
+        complete.datecompleted = timezone.now()
+        complete.save()
+        return redirect('index')
+
+# View to delete tasks
+def delete_task(request, task_id):
+    deleteT = get_object_or_404(request, pk=task_id)
 # view to edit user
 
-@api_view(['GET','PUT'])
+@api_view(['GET', 'PUT'])
 def edit_user(request, user_id):
     user = User.edit_user(request, pk=user_id)
     if request.method == 'PUT':

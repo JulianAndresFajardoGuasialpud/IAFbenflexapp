@@ -7,7 +7,7 @@
     <div class="text-center">
       {% for task in tasks %}
       <li>
-        <a href="{% url 'task_detail' task.id %}">
+        <a href="{% url 'task_update' task.id %}">
           {% if task.important %}
           <q>{{task.title}}</q>
           {% else %}
