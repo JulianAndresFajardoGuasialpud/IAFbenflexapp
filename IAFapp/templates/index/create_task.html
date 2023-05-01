@@ -11,7 +11,7 @@
 
 <body>
     <h1>{{errors}}</h1>
-    <form action="/create_task/" method="POST">
+    <form method="POST">
         {% csrf_token %}
         {{forms.as_p}}
         <button>save</button>
