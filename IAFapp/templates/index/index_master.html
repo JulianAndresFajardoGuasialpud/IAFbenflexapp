@@ -68,9 +68,9 @@
             <div class="menu_section">
               <h3>General</h3>
               <ul class="nav side-menu">
-                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-home"></i> Tareas <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="/create_task">Crear tareas</a></li>
                     <li><a href="index2.html">Dashboard2</a></li>
                     <li><a href="index3.html">Dashboard3</a></li>
                   </ul>
@@ -178,7 +178,7 @@
                 <li><a><i class="fa fa-home"></i> Tareas <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li><a href="/create_task">Crear nueva tarea</a></li>
-                    <li><a href="/">Actualizar tarea</a></li>
+                    <li><a href="{% url 'update_task' task.id %}">Actualizar tarea</a></li>
                   </ul>
                 </li>
 

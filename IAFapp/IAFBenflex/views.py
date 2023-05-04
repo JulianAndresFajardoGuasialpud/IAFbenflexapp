@@ -4,15 +4,15 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 
-from .serializers.serializers import UserSerializers
+# from .serializers.serializers import UserSerializers
 
 # Users django
 from django.contrib.auth.models import User
 
 # import from Users table
-#from IAFBenflex.models import Users
+# from IAFBenflex.models import Users
 
 # imports for user autenticated
 from django.contrib.auth import login, logout, authenticate
@@ -26,7 +26,7 @@ from .models import Task
 
 # Create your views here.
 
-""" !Table for user django model database and task crud¡  """
+""" !Views for user django model database and task crud  """
 
 # View landing page
 
@@ -39,7 +39,8 @@ def landingPages(request):
 
 # View to tasks completed
 def completed_task(request):
-    task = Task.objects.filter(user=request.user, datecompleted__isnull=False).order_by('-datecompleted')
+    task = Task.objects.filter(
+        user=request.user, datecompleted__isnull=False).order_by('-datecompleted')
     return render(request, "index.html", {'tasks': task})
 
 
@@ -48,7 +49,8 @@ def completed_task(request):
 @api_view(['GET'])
 def index(request):
     if request.method == 'GET':
-        task = Task.objects.filter(user=request.user, datecompleted__isnull=True)
+        task = Task.objects.filter(
+            user=request.user, datecompleted__isnull=True)
         return render(request, "index.html", {'tasks': task})
 
 # View login django user
@@ -97,7 +99,6 @@ def create_user(request):
                       {'form': UserCreationForm, 'errors': 'passwod do not mach'})
 
 
-
 # View for logout django user and redirect homepage
 
 
@@ -106,6 +107,7 @@ def signout(request):
     return redirect('home')
 
 
+""" !Views for user django model database and task crud  """
 
 
 """ Functions to tasks """
@@ -128,28 +130,32 @@ def create_task(request):
             return render(request, 'create_task.html',
                           {'forms': TaskForm, 'errors': 'please provide valid data'})
 
-# View to list of tasks and update tasks
+# View to list task
 
 
-@api_view(['GET', 'POST'])
-def update_and_list(request, task_id):
+@api_view(['GET'])
+def list_task(request, list_id):
     if request.method == 'GET':
-        details = get_object_or_404(Task, pk=task_id)
-        formDetails = TaskForm(instance=details)
-        return render(request, 'index.html', {'detail': details, 'form': formDetails})
-    else:
-        try:
-            if request.method == 'POST':
-                details = get_object_or_404(Task, pk=task_id)
-                form = TaskForm(request.POST, instance=details)
-                form.save()
-                return redirect('index')
-        except ValueError:
-            return render(request, 'task_detail.html', {'detail': details, 'form': formDetails, 'errors': 'Error updating task'})
-        
+        details = get_object_or_404(Task, pk=list_id)
+        detailTask = TaskForm(request.GET, instance=details)
+        return render(request, 'index', {'details': detailTask})
+
+# View to update tasks
+
+
+@api_view(['POST'])
+def update_task(request, task_id):
+    try:
+        if request.method == 'POST':
+            updateTask = get_object_or_404(Task, pk=task_id)
+            formTask = TaskForm(request.POST, instance=updateTask)
+            formTask.save()
+            return redirect('index')
+    except ValueError:
+        return render(request, 'updateTask.html', {'update': updateTask, 'form': formTask, 'errors': 'Error updating task'})
+
+
 # view to edit user
-
-
 @api_view(['GET', 'PUT'])
 def edit_user(request, user_id):
     user = User.edit_user(request, pk=user_id)
@@ -162,9 +168,8 @@ def edit_user(request, user_id):
     else:
         return Response('the user do not edit')
 
+
 # View to delete users table_2
-
-
 def delete_user(request, user_id):
     if request.method == 'DELETE':
         users = User.objects.delete_user()

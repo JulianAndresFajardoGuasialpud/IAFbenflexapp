@@ -7,7 +7,7 @@
       <ul>
       {% for task in tasks %}
       <li>
-        <a href="{% url 'task_detail' task.id %}">
+        <a>
           {% if task.important %}
           <h2>{{task.title}}</h2>
           {% else %}
@@ -16,7 +16,7 @@
           <p>{{task.description}}</p>
         </a>
       {% endfor %}
-    </ul>
+      </ul>
     </div>
     {% else %}
       {% if user.is_staff %}
