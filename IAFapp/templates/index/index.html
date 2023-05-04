@@ -1,26 +1,40 @@
 {% extends 'index_master.html' %}
 
 {% block content %}
-{% if user.is_authenticated %}
-<main>
-  <section>
-    <div class="text-center">
+  {% if user.is_authenticated %}
+    <div class="right_col" role="main">
+      <h1>Tareas pendientes de usuarios</h1>
+      <ul>
       {% for task in tasks %}
       <li>
-        <a href="{% url 'task_update' task.id %}">
+        <a href="{% url 'task_detail' task.id %}">
           {% if task.important %}
-          <q>{{task.title}}</q>
+          <h2>{{task.title}}</h2>
           {% else %}
-            {{task.title}}
+          {{task.title}}
           {% endif %}
           <p>{{task.description}}</p>
         </a>
-      </li>
       {% endfor %}
+    </ul>
     </div>
-  </section>
-</main>
-{% else %}
-<center><p>ERROR 404</p></center>
-{% endif %}
+    {% else %}
+      {% if user.is_staff %}
+      <div class="right_col" role="main">
+        <h1>Tareas pendientes</h1>
+        <ul>
+        {% for task in tasks %}
+            {% if task.important %}
+            <h2>{{task.title}}</h2>
+            {% else %}
+            {{task.title}}
+            {% endif %}
+            <p>{{task.description}}</p>
+          </a>
+        {% endfor %}
+      </ul>
+      </div>
+    {% endif %}
+  {% endif %}
+
 {% endblock %}
