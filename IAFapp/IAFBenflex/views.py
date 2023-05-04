@@ -4,19 +4,18 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 
 from .serializers.serializers import UserSerializers
 
 # Users django
 from django.contrib.auth.models import User
 
-# Users from table IAFBenflex
-from IAFBenflex.models import Users
+# import from Users table
+#from IAFBenflex.models import Users
 
-# imports for users autenticated
+# imports for user autenticated
 from django.contrib.auth import login, logout, authenticate
-from django.contrib import messages
 
 # Import forms
 from .forms import TaskForm
@@ -24,7 +23,10 @@ from .forms import TaskForm
 # Import Task to model
 from .models import Task
 
+
 # Create your views here.
+
+""" !Table for user django model database and task crud¡  """
 
 # View landing page
 
@@ -34,12 +36,20 @@ def landingPages(request):
     if request.method == 'GET':
         return render(request, 'home.html')
 
-# View task in the index panel user
 
-
-def index(request):
-    task = Task.objects.filter(user=request.user)
+# View to tasks completed
+def completed_task(request):
+    task = Task.objects.filter(user=request.user, datecompleted__isnull=False).order_by('-datecompleted')
     return render(request, "index.html", {'tasks': task})
+
+
+# View tasks not completed (task pending of users)
+
+@api_view(['GET'])
+def index(request):
+    if request.method == 'GET':
+        task = Task.objects.filter(user=request.user, datecompleted__isnull=True)
+        return render(request, "index.html", {'tasks': task})
 
 # View login django user
 
@@ -63,18 +73,8 @@ def user_login(request):
             login(request, users)
             return redirect('index')
 
-# View para la lista de usuarios de administacion
-
-
-@api_view(['GET'])
-def user_list(request):
-    users = User.objects.all()
-    serializer = UserSerializers(users, many=True)
-    return Response(serializer.data)
 
 # View to create user
-
-
 @api_view(['GET', 'POST'])
 def create_user(request):
     if request.method == 'GET':
@@ -96,7 +96,20 @@ def create_user(request):
         return render(request, 'register.html',
                       {'form': UserCreationForm, 'errors': 'passwod do not mach'})
 
-# View create task
+
+
+# View for logout django user and redirect homepage
+
+
+def signout(request):
+    logout(request)
+    return redirect('home')
+
+
+
+
+""" Functions to tasks """
+# View to create task
 
 
 @api_view(['GET', 'POST'])
@@ -115,15 +128,15 @@ def create_task(request):
             return render(request, 'create_task.html',
                           {'forms': TaskForm, 'errors': 'please provide valid data'})
 
-# View to details of tasks and update
+# View to list of tasks and update tasks
 
 
 @api_view(['GET', 'POST'])
-def task_detail(request, task_id):
+def update_and_list(request, task_id):
     if request.method == 'GET':
         details = get_object_or_404(Task, pk=task_id)
         formDetails = TaskForm(instance=details)
-        return render(request, 'task_detail.html', {'detail': details, 'form': formDetails})
+        return render(request, 'index.html', {'detail': details, 'form': formDetails})
     else:
         try:
             if request.method == 'POST':
@@ -132,7 +145,7 @@ def task_detail(request, task_id):
                 form.save()
                 return redirect('index')
         except ValueError:
-            return render(request, 'task_detail.html', {'detail': details, 'form': formDetails, 'errors': 'Error updating task'})
+            return render(request, 'index.html', {'detail': details, 'form': formDetails, 'errors': 'Error updating task'})
 
 
 # view to complete_task
@@ -140,15 +153,33 @@ def task_detail(request, task_id):
 def complete_task(request, task_id):
     complete = get_object_or_404(Task, pk=task_id)
     if request.method == 'POST':
-        complete = get_object_or_404(Task, pk=task_id)
         complete.datecompleted = timezone.now()
         complete.save()
         return redirect('index')
 
 # View to delete tasks
+
+
+@api_view(['POST'])
 def delete_task(request, task_id):
-    deleteT = get_object_or_404(request, pk=task_id)
+    deleteT = get_object_or_404(Task, pk=task_id)
+    if request.method == 'POST':
+        deleteT.delete()
+        return redirect('index')
+""" !Table for user django model database and task crud¡  """
+
+
+# Tables of Users model
+
+# View for the users administration
+@api_view(['GET'])
+def user_list(request):
+    users = User.objects.all()
+    serializer = UserSerializers(users, many=True)
+    return Response(serializer.data)
+
 # view to edit user
+
 
 @api_view(['GET', 'PUT'])
 def edit_user(request, user_id):
@@ -168,10 +199,3 @@ def edit_user(request, user_id):
 def delete_user(request, user_id):
     if request.method == 'DELETE':
         users = User.objects.delete_user()
-
-# View para cerrar sesion de user django
-
-
-def signout(request):
-    logout(request)
-    return redirect('home')
